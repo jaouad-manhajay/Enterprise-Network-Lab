@@ -1,41 +1,61 @@
 # 🏢 Enterprise Network Lab
 
-## 📖 Project Overview
-
-This project simulates a real enterprise network built in EVE-NG.
-
-The objective is to design, configure, secure, and document a professional network infrastructure similar to what is deployed in companies.
+> A professional enterprise network infrastructure project built in EVE-NG.
 
 ---
 
-## 🎯 Objectives
+# 📖 Project Overview
 
-- Build a scalable enterprise network.
-- Configure VLANs and Inter-VLAN Routing.
-- Deploy OSPF routing.
-- Configure FortiGate Firewall.
-- Configure pfSense Firewall.
-- Deploy Windows Server services.
-- Configure DHCP, DNS and Active Directory.
-- Implement monitoring and documentation.
-- Practice enterprise troubleshooting.
+This project simulates a real enterprise environment using Cisco routers, Layer 2 switches, FortiGate, pfSense and Windows Server.
+
+The objective is to design, secure, monitor and document a production-like enterprise network.
 
 ---
 
-## 🛠 Technologies
+# 🛠 Technologies
 
 - Cisco vIOS Router
 - Cisco IOSv-L2
-- FortiGate
-- pfSense
+- FortiGate Firewall
+- pfSense Firewall
 - Windows Server 2019
 - EVE-NG
-- Git
-- GitHub
 - Visual Studio Code
+- Git & GitHub
 
 ---
 
-## 🚧 Project Status
+# 🗂 Project Structure
+
+```text
+Enterprise-Network-Lab
+│
+├── Configurations
+├── Diagrams
+├── Documentation
+├── Screenshots
+├── Topology
+└── README.md
+```
+
+---
+
+# 🚀 Project Phases
+
+- [x] Project Initialization
+- [ ] Basic Configuration
+- [ ] WAN Configuration
+- [ ] VLAN Configuration
+- [ ] Inter-VLAN Routing
+- [ ] OSPF
+- [ ] FortiGate
+- [ ] pfSense
+- [ ] Windows Server
+- [ ] Monitoring
+- [ ] Final Documentation
+
+---
+
+# 📌 Status
 
 🟢 In Progress
