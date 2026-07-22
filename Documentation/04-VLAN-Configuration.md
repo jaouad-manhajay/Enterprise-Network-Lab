@@ -33,9 +33,68 @@ show vlan brief
 
 Configure trunk links between the CORE-SW and the access switches.
 
-## CORE-SW
+# CORE-SW Configuration
 
-### GigabitEthernet0/0 (SW-IT)
+## Objective
+
+Configure the core switch, create VLANs, and establish trunk links with the access switches.
+
+---
+
+# Basic Configuration
+
+```cisco
+hostname CORE-SW
+no ip domain-lookup
+service password-encryption
+
+enable secret Lab@2026
+
+username admin privilege 15 secret Admin@2026
+
+ip domain-name enterprise.lab
+
+crypto key generate rsa modulus 2048
+
+ip ssh version 2
+
+line console 0
+password Lab@2026
+login
+logging synchronous
+
+line vty 0 15
+login local
+transport input ssh
+
+banner motd #
+Authorized Access Only!
+#
+```
+
+---
+
+# VLAN Configuration
+
+```cisco
+vlan 10
+name IT
+
+vlan 20
+name HR
+
+vlan 30
+name SERVERS
+
+vlan 99
+name MANAGEMENT
+```
+
+---
+
+# Trunk Configuration
+
+## Trunk to SW-IT
 
 ```cisco
 interface GigabitEthernet0/0
@@ -46,7 +105,7 @@ switchport trunk allowed vlan 10,20,30,99
 no shutdown
 ```
 
-### GigabitEthernet0/2 (SW-HR)
+## Trunk to SW-HR
 
 ```cisco
 interface GigabitEthernet0/2
@@ -57,7 +116,7 @@ switchport trunk allowed vlan 10,20,30,99
 no shutdown
 ```
 
-### GigabitEthernet0/3 (SW-SRV)
+## Trunk to SW-SRV
 
 ```cisco
 interface GigabitEthernet0/3
@@ -68,12 +127,33 @@ switchport trunk allowed vlan 10,20,30,99
 no shutdown
 ```
 
-## Verification
+---
+
+# Verification
 
 ```cisco
+show vlan brief
+
 show interfaces trunk
+
+show interfaces status
+
+show running-config
 ```
+
 ---
+
+# Notes
+
+- Created VLAN 10 (IT).
+- Created VLAN 20 (HR).
+- Created VLAN 30 (SERVERS).
+- Created VLAN 99 (MANAGEMENT).
+- Configured IEEE 802.1Q trunk links between CORE-SW and all access switches.
+- Allowed VLANs 10,20,30,99 on all trunk interfaces.
+- Password encryption enabled.
+- SSH access configured.
+- Local administrator account created.
 
 # SW-IT Configuration
 
