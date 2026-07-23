@@ -2,46 +2,28 @@
 
 ## Objective
 
-Create VLANs for the enterprise network.
+This document describes the VLAN implementation and trunk configuration for the enterprise network. It includes the configuration of the Core Switch and all Access Switches.
 
-## Configuration
-
-```cisco
-vlan 10
-name IT
-
-vlan 20
-name HR
-
-vlan 30
-name SERVERS
-
-vlan 99
-name MANAGEMENT
-```
-
-## Verification
-
-```cisco
-show vlan brief
-```
 ---
 
-# Trunk Configuration
+# Network VLANs
 
-## Objective
+| VLAN ID | Name | Purpose |
+|---------:|------|---------|
+| 10 | IT | IT Department |
+| 20 | HR | Human Resources |
+| 30 | SERVERS | Servers |
+| 99 | MANAGEMENT | Management & Device Administration |
 
-Configure trunk links between the CORE-SW and the access switches.
+---
 
 # CORE-SW Configuration
 
 ## Objective
 
-Configure the core switch, create VLANs, and establish trunk links with the access switches.
+Configure the Core Switch, create VLANs and establish trunk links with all access switches.
 
----
-
-# Basic Configuration
+### Basic Configuration
 
 ```cisco
 hostname CORE-SW
@@ -59,109 +41,105 @@ crypto key generate rsa modulus 2048
 ip ssh version 2
 
 line console 0
-password Lab@2026
-login
-logging synchronous
+ password Lab@2026
+ login
+ logging synchronous
 
 line vty 0 15
-login local
-transport input ssh
+ login local
+ transport input ssh
 
 banner motd #
 Authorized Access Only!
 #
 ```
 
----
-
-# VLAN Configuration
+### VLAN Configuration
 
 ```cisco
 vlan 10
-name IT
+ name IT
 
 vlan 20
-name HR
+ name HR
 
 vlan 30
-name SERVERS
+ name SERVERS
 
 vlan 99
-name MANAGEMENT
+ name MANAGEMENT
 ```
 
----
+### Trunk Configuration
 
-# Trunk Configuration
-
-## Trunk to SW-IT
+#### Trunk to SW-IT
 
 ```cisco
 interface GigabitEthernet0/0
-description Trunk to SW-IT
-switchport trunk encapsulation dot1q
-switchport mode trunk
-switchport trunk allowed vlan 10,20,30,99
-no shutdown
+ description Trunk to SW-IT
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30,99
+ no shutdown
 ```
 
-## Trunk to SW-HR
+#### Trunk to EDGE-R1
+
+```cisco
+interface GigabitEthernet0/1
+ description Trunk to EDGE-R1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30,99
+ no shutdown
+```
+
+#### Trunk to SW-HR
 
 ```cisco
 interface GigabitEthernet0/2
-description Trunk to SW-HR
-switchport trunk encapsulation dot1q
-switchport mode trunk
-switchport trunk allowed vlan 10,20,30,99
-no shutdown
+ description Trunk to SW-HR
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30,99
+ no shutdown
 ```
 
-## Trunk to SW-SRV
+#### Trunk to SW-SRV
 
 ```cisco
 interface GigabitEthernet0/3
-description Trunk to SW-SRV
-switchport trunk encapsulation dot1q
-switchport mode trunk
-switchport trunk allowed vlan 10,20,30,99
-no shutdown
+ description Trunk to SW-SRV
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30,99
+ no shutdown
 ```
 
----
-
-# Verification
+### Verification
 
 ```cisco
 show vlan brief
-
 show interfaces trunk
-
 show interfaces status
-
-show running-config
 ```
 
----
+### Notes
 
-# Notes
-
-- Created VLAN 10 (IT).
-- Created VLAN 20 (HR).
-- Created VLAN 30 (SERVERS).
-- Created VLAN 99 (MANAGEMENT).
-- Configured IEEE 802.1Q trunk links between CORE-SW and all access switches.
-- Allowed VLANs 10,20,30,99 on all trunk interfaces.
+- VLANs created successfully.
+- IEEE 802.1Q trunks configured.
+- SSH enabled.
 - Password encryption enabled.
-- SSH access configured.
-- Local administrator account created.
+
+---
 
 # SW-IT Configuration
 
 ## Objective
 
-Configure the SW-IT access switch with a trunk uplink to the CORE-SW and assign the user port to VLAN 10.
+Configure the IT access switch.
 
-## Basic Configuration
+### Basic Configuration
 
 ```cisco
 hostname SW-IT
@@ -179,42 +157,42 @@ crypto key generate rsa modulus 2048
 ip ssh version 2
 
 line console 0
-password Lab@2026
-login
-logging synchronous
+ password Lab@2026
+ login
+ logging synchronous
 
 line vty 0 15
-login local
-transport input ssh
+ login local
+ transport input ssh
 
 banner motd #
 Authorized Access Only!
 #
 ```
 
-## Trunk Configuration
+### Trunk Configuration
 
 ```cisco
 interface GigabitEthernet0/0
-description Trunk to CORE-SW
-switchport trunk encapsulation dot1q
-switchport mode trunk
-switchport trunk allowed vlan 10,20,30,99
-no shutdown
+ description Trunk to CORE-SW
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30,99
+ no shutdown
 ```
 
-## Access Port Configuration
+### Access Port
 
 ```cisco
 interface GigabitEthernet0/1
-description PC-IT
-switchport mode access
-switchport access vlan 10
-spanning-tree portfast
-no shutdown
+ description PC-IT
+ switchport mode access
+ switchport access vlan 10
+ spanning-tree portfast
+ no shutdown
 ```
 
-## Verification
+### Verification
 
 ```cisco
 show interfaces trunk
@@ -222,11 +200,10 @@ show vlan brief
 show interfaces status
 ```
 
-## Notes
+### Notes
 
-- Uplink configured as an IEEE 802.1Q trunk.
-- User access port assigned to VLAN 10.
-- PortFast enabled on the access interface connected to the end device.
+- Uplink configured as trunk.
+- PC assigned to VLAN 10.
 
 ---
 
@@ -234,62 +211,38 @@ show interfaces status
 
 ## Objective
 
-Configure the SW-HR access switch with a trunk uplink to the CORE-SW and assign the user port to VLAN 20.
+Configure the HR access switch.
 
-## Basic Configuration
+### Basic Configuration
 
 ```cisco
 hostname SW-HR
-no ip domain-lookup
-service password-encryption
-
-enable secret Lab@2026
-
-username admin privilege 15 secret Admin@2026
-
-ip domain-name enterprise.lab
-
-crypto key generate rsa modulus 2048
-
-ip ssh version 2
-
-line console 0
-password Lab@2026
-login
-logging synchronous
-
-line vty 0 15
-login local
-transport input ssh
-
-banner motd #
-Authorized Access Only!
-#
+...
 ```
 
-## Trunk Configuration
+### Trunk Configuration
 
 ```cisco
 interface GigabitEthernet0/2
-description Trunk to CORE-SW
-switchport trunk encapsulation dot1q
-switchport mode trunk
-switchport trunk allowed vlan 10,20,30,99
-no shutdown
+ description Trunk to CORE-SW
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30,99
+ no shutdown
 ```
 
-## Access Port Configuration
+### Access Port
 
 ```cisco
 interface GigabitEthernet0/1
-description PC-HR
-switchport mode access
-switchport access vlan 20
-spanning-tree portfast
-no shutdown
+ description PC-HR
+ switchport mode access
+ switchport access vlan 20
+ spanning-tree portfast
+ no shutdown
 ```
 
-## Verification
+### Verification
 
 ```cisco
 show interfaces trunk
@@ -297,12 +250,9 @@ show vlan brief
 show interfaces status
 ```
 
-## Notes
+### Notes
 
-- Uplink configured as an IEEE 802.1Q trunk.
-- User access port assigned to VLAN 20.
-- PortFast enabled on the access interface.
-
+- PC assigned to VLAN 20.
 
 ---
 
@@ -310,62 +260,38 @@ show interfaces status
 
 ## Objective
 
-Configure the SW-SRV access switch with a trunk uplink to the CORE-SW and assign the server port to VLAN 30.
+Configure the Server access switch.
 
-## Basic Configuration
+### Basic Configuration
 
 ```cisco
 hostname SW-SRV
-no ip domain-lookup
-service password-encryption
-
-enable secret Lab@2026
-
-username admin privilege 15 secret Admin@2026
-
-ip domain-name enterprise.lab
-
-crypto key generate rsa modulus 2048
-
-ip ssh version 2
-
-line console 0
-password Lab@2026
-login
-logging synchronous
-
-line vty 0 15
-login local
-transport input ssh
-
-banner motd #
-Authorized Access Only!
-#
+...
 ```
 
-## Trunk Configuration
+### Trunk Configuration
 
 ```cisco
 interface GigabitEthernet0/3
-description Trunk to CORE-SW
-switchport trunk encapsulation dot1q
-switchport mode trunk
-switchport trunk allowed vlan 10,20,30,99
-no shutdown
+ description Trunk to CORE-SW
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30,99
+ no shutdown
 ```
 
-## Access Port Configuration
+### Access Port
 
 ```cisco
 interface GigabitEthernet0/1
-description Windows Server
-switchport mode access
-switchport access vlan 30
-spanning-tree portfast
-no shutdown
+ description Windows Server
+ switchport mode access
+ switchport access vlan 30
+ spanning-tree portfast
+ no shutdown
 ```
 
-## Verification
+### Verification
 
 ```cisco
 show interfaces trunk
@@ -373,8 +299,39 @@ show vlan brief
 show interfaces status
 ```
 
-## Notes
+### Notes
 
-- Uplink configured as an IEEE 802.1Q trunk.
-- Server port assigned to VLAN 30.
-- PortFast enabled on the server access interface.
+- Windows Server assigned to VLAN 30.
+
+---
+
+# Validation Checklist
+
+| Task | Status |
+|------|--------|
+| VLAN 10 Created | ✅ |
+| VLAN 20 Created | ✅ |
+| VLAN 30 Created | ✅ |
+| VLAN 99 Created | ✅ |
+| Trunks Configured | ✅ |
+| Access Ports Configured | ✅ |
+| SSH Enabled | ✅ |
+| Running Configuration Saved | ✅ |
+
+---
+
+# Screenshots
+
+- CORE-SW VLAN Table
+- CORE-SW Trunk Status
+- SW-IT VLAN Table
+- SW-HR VLAN Table
+- SW-SRV VLAN Table
+- Trunk Verification
+- Running Configuration
+
+---
+
+# Conclusion
+
+The VLAN infrastructure has been successfully deployed. All switches are configured with secure management settings, VLAN segmentation, and IEEE 802.1Q trunk links. The network is now ready for the next phase: **Inter-VLAN Routing (Router-on-a-Stick)**.
